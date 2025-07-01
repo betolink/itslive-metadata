@@ -19,7 +19,7 @@ LABEL org.opencontainers.image.documentation="https://hyp3-docs.asf.alaska.edu"
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends unzip vim && \
+RUN apt-get update && apt-get install -y --no-install-recommends unzip vim build-essential python3-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ARG CONDA_UID=1000
