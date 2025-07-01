@@ -41,7 +41,7 @@ def main() -> None:
                     upload_file_to_s3(file, args.stac_ouput)
                 upload_file_to_s3(file, args.bucket, args.bucket_prefix)
             logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
-            print(f"Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}")
+            print(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
 
 
 if __name__ == '__main__':
