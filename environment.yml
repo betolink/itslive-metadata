@@ -11,6 +11,7 @@ dependencies:
   - pytest-cov
   - ciso8601
   - neovim
+  - zarr<=3.0.0a
   - unzip
   - s3fs
   # For running
