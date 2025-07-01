@@ -15,6 +15,7 @@ def main() -> None:
     parser.add_argument('--bucket-prefix', default='', help='Add a bucket prefix to product(s)')
 
     parser.add_argument('--stac-output', help='S3 location for STAC item', default='s3://its-live-data/test-space/stac/ndjson/ingest')
+    parser.add_argument('--upload', help='Upload metadata files to S3', default=False, action='store_true',)
 
     args = parser.parse_args()
 
@@ -28,13 +29,14 @@ def main() -> None:
             bucket=args.bucket,
             prefix=args.bucket_prefix
         )
-
-        for file in metadata_files:
-            if ".stac.json" in file.name:
-                # assumes the same AWS credentials will work with this bucket
-                upload_file_to_s3(file, args.stac_ouput)
-            upload_file_to_s3(file, args.bucket, args.bucket_prefix)
-        logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
+        if args.upload:
+            logging.debug('Uploading metadata files to S3...')
+            for file in metadata_files:
+                if ".stac.json" in file.name:
+                    # assumes the same AWS credentials will work with this bucket
+                    upload_file_to_s3(file, args.stac_ouput)
+                upload_file_to_s3(file, args.bucket, args.bucket_prefix)
+            logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
 
 
 if __name__ == '__main__':
