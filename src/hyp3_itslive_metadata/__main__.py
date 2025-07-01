@@ -15,7 +15,9 @@ def main() -> None:
     parser.add_argument('--bucket-prefix', default='', help='Add a bucket prefix to product(s)')
 
     parser.add_argument(
-        '--stac-output', help='S3 location for STAC item', default='s3://its-live-data/test-space/stac/ndjson/ingest'
+        '--stac-output',
+        help='S3 location for STAC item inside the its-live-data bucket',
+        default='s3://its-live-data/test-space/stac/ndjson/ingest',
     )
     parser.add_argument(
         '--upload',
@@ -38,10 +40,9 @@ def main() -> None:
             for file in metadata_files:
                 if '.stac.json' in file.name:
                     # assumes the same AWS credentials will work with this bucket
-                    upload_file_to_s3(file, args.stac_ouput)
+                    upload_file_to_s3(file, bucket='its-live-data', prefix=args.stac_output)
                 upload_file_to_s3(file, args.bucket, args.bucket_prefix)
             logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
-            print(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
 
 
 if __name__ == '__main__':
