@@ -14,8 +14,7 @@ def main() -> None:
     parser.add_argument('--bucket', help='AWS S3 bucket HyP3 for upload the final product(s)')
     parser.add_argument('--bucket-prefix', default='', help='Add a bucket prefix to product(s)')
 
-    # TODO: Your arguments here
-    parser.add_argument('--greeting', default='Hello world!', help='Write this greeting to a product file')
+    parser.add_argument('--stac-output', help='S3 location for STAC item', default='s3://its-live-data/test-space/stac/ndjson/ingest')
 
     args = parser.parse_args()
 
@@ -23,12 +22,18 @@ def main() -> None:
         format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
     )
 
-    product_file = process_itslive_metadata(
-        greeting=args.greeting,
-    )
 
-    if args.bucket:
-        upload_file_to_s3(product_file, args.bucket, args.bucket_prefix)
+    if args.bucket and args.bucket_prefix:
+        metadata_files = process_itslive_metadata(
+            bucket=args.bucket,
+            prefix=args.bucket_prefix
+        )
+
+        for file in metadata_files:
+            if ".stac.json" in file.name:
+                # assumes the same AWS credentials will work with this bucket
+                upload_file_to_s3(file, args.stac_ouput)
+            upload_file_to_s3(file, args.bucket, args.bucket_prefix)
 
 
 if __name__ == '__main__':
