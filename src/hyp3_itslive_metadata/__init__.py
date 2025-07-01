@@ -1,4 +1,4 @@
-"""ITS_LIVE granle metadata generator"""
+"""ITS_LIVE granle metadata generator."""
 
 from importlib.metadata import version
 

@@ -10,10 +10,8 @@ from cryoforge import generate_itslive_metadata, save_metadata
 log = logging.getLogger(__name__)
 
 
-def process_itslive_metadata(bucket: str = "",
-                             prefix: str = "") -> list[Path]:
-    """Generates ITS_LIVE granule metadata files from a source S3 bucket, copies the files back to the source bucket.
-    It also copies the STAC item to a designated ingest location in S3.
+def process_itslive_metadata(bucket: str = "", prefix: str = "") -> list[Path]:
+    """Generates ITS_LIVE granule metadata files from a source S3 bucket and prefix.
 
     Args:
         bucket: S3 bucket.
