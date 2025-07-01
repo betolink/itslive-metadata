@@ -12,3 +12,5 @@ and uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - hyp3-itslive-metadata plugin created with the [HyP3 Cookiecutter](https://github.com/ASFHyP3/hyp3-cookiecutter)
 - switched to micromamba
 - install neovim and unzip with conda-forge
+- fixed entrypoint so it's micromamba compatible
+
