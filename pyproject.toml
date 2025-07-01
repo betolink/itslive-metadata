@@ -23,7 +23,8 @@ classifiers=[
 ]
 dependencies = [
     "hyp3lib>=3,<4",
-    # TODO: insert Python dependencies as list here
+    "cryoforge>=0.2.0,<1.0.0",
+    "s3fs>=2025.1.0"
 ]
 dynamic = ["version"]
 
