@@ -29,6 +29,7 @@ def main() -> None:
     logging.basicConfig(
         format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
     )
+    print(f'Processing itslive metadata with args: {args}')
 
     if args.bucket and args.bucket_prefix:
         metadata_files = process_itslive_metadata(bucket=args.bucket, prefix=args.bucket_prefix)
@@ -40,6 +41,7 @@ def main() -> None:
                     upload_file_to_s3(file, args.stac_ouput)
                 upload_file_to_s3(file, args.bucket, args.bucket_prefix)
             logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
+            print(f"Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}")
 
 
 if __name__ == '__main__':

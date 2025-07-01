@@ -12,7 +12,8 @@ LABEL org.opencontainers.image.documentation="https://hyp3-docs.asf.alaska.edu"
 ENV MAMBA_DOCKERFILE_ACTIVATE=1 \
     MAMBA_CREATE_ENV=hyp3-itslive-metadata \
     PYTHONDONTWRITEBYTECODE=1 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    SETUPTOOLS_SCM_PRETEND_VERSION=0.1.0
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER . /hyp3-itslive-metadata/
 
@@ -21,7 +22,5 @@ RUN micromamba install -y -n base -f /hyp3-itslive-metadata/environment.yml && \
     micromamba clean --all --yes
 
 
-ENTRYPOINT ["/hyp3-itslive-metadata/src/hyp3_itslive_metadata/etc/entrypoint.sh"]
-
-CMD ["-h"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "/hyp3-itslive-metadata/src/hyp3_itslive_metadata/etc/entrypoint.sh"]
 
