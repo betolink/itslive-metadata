@@ -10,7 +10,7 @@ from cryoforge import generate_itslive_metadata, save_metadata
 log = logging.getLogger(__name__)
 
 
-def process_itslive_metadata(bucket: str = "", prefix: str = "") -> list[Path]:
+def process_itslive_metadata(bucket: str = '', prefix: str = '') -> list[Path]:
     """Generates ITS_LIVE granule metadata files from a source S3 bucket and prefix.
 
     Args:
@@ -25,18 +25,18 @@ def process_itslive_metadata(bucket: str = "", prefix: str = "") -> list[Path]:
     bucket_prefix = str(PurePosixPath(bucket) / prefix)
     if not bucket_prefix.endswith('/'):
         bucket_prefix += '/'
-    granules = s3_fs.glob(f'{bucket_prefix}*.nc') # should only be one
+    granules = s3_fs.glob(f'{bucket_prefix}*.nc')  # should only be one
     granule = granules[0] if granules else None
     if not granule:
-        raise ValueError(f"No granules found in {bucket_prefix}")
+        raise ValueError(f'No granules found in {bucket_prefix}')
 
     log.debug(f'Processing itslive metadata for granule: {granule}')
     metadata = generate_itslive_metadata(
         url=granule,
-        store=None # Store is for Obstore
+        store=None,  # Store is for Obstore
     )
-    # saves the stac item, the nsidc 
-    save_metadata(metadata, "./output")
-    file_paths = [f for f in Path("./output").glob("*") if not f.name.endswith(".ref.json")]
+    # saves the stac item, the nsidc
+    save_metadata(metadata, './output')
+    file_paths = [f for f in Path('./output').glob('*') if not f.name.endswith('.ref.json')]
 
     return file_paths
