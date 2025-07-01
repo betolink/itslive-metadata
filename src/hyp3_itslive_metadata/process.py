@@ -26,7 +26,7 @@ def process_itslive_metadata(bucket: str = '', prefix: str = '') -> list[Path]:
     if not bucket_prefix.endswith('/'):
         bucket_prefix += '/'
     granules = s3_fs.glob(f'{bucket_prefix}*.nc')  # should only be one
-    granule = f"s3://{granules[0]}" if granules else None
+    granule = f's3://{granules[0]}' if granules else None
     if not granule:
         raise ValueError(f'No granules found in {bucket_prefix}')
 
@@ -36,7 +36,7 @@ def process_itslive_metadata(bucket: str = '', prefix: str = '') -> list[Path]:
         store=None,  # Store is for Obstore
     )
     # saves the stac item, the nsidc
-    output_path = Path("./output")
+    output_path = Path('./output')
     output_path.mkdir(parents=True, exist_ok=True)
     save_metadata(metadata, './output')
     file_paths = [f for f in Path('./output').glob('*') if not f.name.endswith('.ref.json')]
