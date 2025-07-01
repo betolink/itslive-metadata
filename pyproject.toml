@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hyp3_itslive_metadata"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
     {name="betolink", email="betolin@gmail.com"},
 ]
@@ -17,7 +17,6 @@ classifiers=[
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -89,7 +88,7 @@ suppress-dummy-args = true
 
 # Please keep the following mypy options up-to-date with https://github.com/ASFHyP3/actions/#reusable-mypyyml
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 warn_redundant_casts = true
 warn_unused_ignores = true
 warn_unreachable = true
