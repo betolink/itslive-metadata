@@ -2,28 +2,27 @@
 
 import logging
 from argparse import ArgumentParser
+from pathlib import Path
+from urllib.parse import urlparse
 
 from hyp3lib.aws import upload_file_to_s3
 
+from hyp3_itslive_metadata.aws import determine_granule_uri_from_bucket, upload_file_to_s3_with_publish_access_keys
 from hyp3_itslive_metadata.process import process_itslive_metadata
 
 
 def main() -> None:
     """HyP3 entrypoint for hyp3_itslive_metadata."""
     parser = ArgumentParser()
-    parser.add_argument('--bucket', help='AWS S3 bucket HyP3 for upload the final product(s)')
-    parser.add_argument('--bucket-prefix', default='', help='Add a bucket prefix to product(s)')
+    hyp3_group = parser.add_argument_group('HyP3 content bucket', 'AWS S3 bucket and prefix to upload metadata product(s) to. Will also be used to find the input granule if `--granule-uri` is not provided`.')
+    hyp3_group.add_argument('--bucket')
+    hyp3_group.add_argument('--bucket-prefix', default='')
+
+    parser.add_argument('--granule-uri', help='URI for a granule to generate metadata for. If not provided, will find the first granule in HyP3 content bucket.')
 
     parser.add_argument(
-        '--stac-output',
-        help='S3 location for STAC item inside the its-live-data bucket',
-        default='s3://its-live-data/test-space/stac/ndjson/ingest',
-    )
-    parser.add_argument(
-        '--upload',
-        help='Upload metadata files to S3',
-        default=False,
-        action='store_true',
+        '--publish-output',
+        help='Additional S3 location (bucket + prefix) for STAC item to be published to (e.g., `s3://its-live-data/test-space/stac/ndjson/ingest`).',
     )
 
     args = parser.parse_args()
@@ -31,18 +30,34 @@ def main() -> None:
     logging.basicConfig(
         format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
     )
-    print(f'Processing itslive metadata with args: {args}')
+    logging.info(f'Processing itslive metadata with args: {args}')
+
+    if args.granule_uri is None:
+        if args.bucket:
+            args.granule_uri = determine_granule_uri_from_bucket(args.bucket, args.bucket_prefix)
+        else:
+            raise ValueError('Must provide --granule-uri or --bucket')
+
+    metadata_files = process_itslive_metadata(args.granule_uri)
 
     if args.bucket and args.bucket_prefix:
-        metadata_files = process_itslive_metadata(bucket=args.bucket, prefix=args.bucket_prefix)
-        if args.upload:
-            logging.debug('Uploading metadata files to S3...')
-            for file in metadata_files:
-                if '.stac.json' in file.name:
-                    # assumes the same AWS credentials will work with this bucket
-                    upload_file_to_s3(file, bucket='its-live-data', prefix=args.stac_output)
-                upload_file_to_s3(file, args.bucket, args.bucket_prefix)
-            logging.info(f'Uploaded {len(metadata_files)} files to {args.bucket}/{args.bucket_prefix}')
+        logging.info(f'Uploading metadata files to s3://{args.bucket}/{args.bucket_prefix}/')
+        for file in metadata_files:
+            upload_file_to_s3(file, args.bucket, args.bucket_prefix)
+
+    if args.publish_output:
+        logging.info('Adjusting STAC JSON for publication path')
+        logging.info('Publishing STAC JSON')
+        for file in metadata_files:
+            if '.stac.json' in file.name:
+                publish_uri = urlparse(args.stac_output)
+                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_uri.netloc,
+                                                           prefix=publish_uri.path.lstrip('/'))
+            else:
+                # TODO: Assumes `granule_uri` is the published URI; logic is a bit convoluted and should be revisited
+                publish_uri = urlparse(args.granule_uri)
+                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_uri.netloc,
+                                                           prefix=str(Path(publish_uri.path).parent))
 
 
 if __name__ == '__main__':
