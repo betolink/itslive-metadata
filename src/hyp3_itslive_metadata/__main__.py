@@ -11,6 +11,10 @@ from hyp3_itslive_metadata.aws import determine_granule_uri_from_bucket, upload_
 from hyp3_itslive_metadata.process import process_itslive_metadata
 
 
+def str_without_trailing_slash(s: str) -> str:
+    return s.rstrip('/')
+
+
 def main() -> None:
     """HyP3 entrypoint for hyp3_itslive_metadata."""
     parser = ArgumentParser()
@@ -22,6 +26,7 @@ def main() -> None:
 
     parser.add_argument(
         '--publish-output',
+        type=str_without_trailing_slash,
         help='Additional S3 location (bucket + prefix) for STAC item to be published to (e.g., `s3://its-live-data/test-space/stac/ndjson/ingest`).',
     )
 
@@ -46,18 +51,18 @@ def main() -> None:
             upload_file_to_s3(file, args.bucket, args.bucket_prefix)
 
     if args.publish_output:
-        logging.info('Adjusting STAC JSON for publication path')
-        logging.info('Publishing STAC JSON')
         for file in metadata_files:
             if '.stac.json' in file.name:
+                logging.info(f'Publishing STAC JSON to: {args.stac_output}/{file.name}')
                 publish_uri = urlparse(args.stac_output)
                 upload_file_to_s3_with_publish_access_keys(file, bucket=publish_uri.netloc,
                                                            prefix=publish_uri.path.lstrip('/'))
             else:
-                # TODO: Assumes `granule_uri` is the published URI; logic is a bit convoluted and should be revisited
                 publish_uri = urlparse(args.granule_uri)
-                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_uri.netloc,
-                                                           prefix=str(Path(publish_uri.path).parent))
+                publish_bucket = publish_uri.netloc
+                publish_prefix = str(Path(publish_uri.path).parent)
+                logging.info(f'Publishing {file.suffix.upper()} to: {publish_bucket}/{publish_prefix}/{file.name}')
+                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_bucket, prefix=publish_prefix)
 
 
 if __name__ == '__main__':
