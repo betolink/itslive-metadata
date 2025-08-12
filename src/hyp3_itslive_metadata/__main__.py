@@ -11,8 +11,9 @@ from hyp3_itslive_metadata.aws import determine_granule_uri_from_bucket, upload_
 from hyp3_itslive_metadata.process import process_itslive_metadata
 
 
-def str_without_trailing_slash(s: str) -> str:
-    return s.rstrip('/')
+def nullable_string(argument_string: str) -> str | None:
+    argument_string = argument_string.replace('None', '').strip()
+    return argument_string if argument_string else None
 
 
 def main() -> None:
@@ -30,12 +31,16 @@ def main() -> None:
         help='URI for a granule to generate metadata for. If not provided, will find the first granule in HyP3 content bucket.',
     )
 
-    parser.add_argument(
-        '--publish-output',
-        type=str_without_trailing_slash,
-        help='Additional S3 location (bucket + prefix) for STAC item to be published to (e.g., `s3://its-live-data/test-space/stac/ndjson/ingest`).',
+    publish_group = parser.add_argument_group(
+        'Data publishing bucket',
+        'AWS S3 bucket and prefix to publish STAC JSONs to.'
     )
-
+    publish_group.add_argument(
+        '--publish-bucket', type=nullable_string,
+    )
+    publish_group.add_argument(
+        '--publish-prefix', type=nullable_string,
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -49,6 +54,9 @@ def main() -> None:
         else:
             raise ValueError('Must provide --granule-uri or --bucket')
 
+    if args.publish_prefix:
+        args.publish_prefix = args.publish_prefix.strip('/')
+
     metadata_files = process_itslive_metadata(args.granule_uri)
 
     if args.bucket and args.bucket_prefix:
@@ -56,20 +64,15 @@ def main() -> None:
         for file in metadata_files:
             upload_file_to_s3(file, args.bucket, args.bucket_prefix)
 
-    if args.publish_output:
+    if args.publish_bucket:
         for file in metadata_files:
             if '.stac.json' in file.name:
-                logging.info(f'Publishing STAC JSON to: {args.publish_output}/{file.name}')
-                publish_uri = urlparse(args.publish_output)
-                upload_file_to_s3_with_publish_access_keys(
-                    file, bucket=publish_uri.netloc, prefix=publish_uri.path.lstrip('/')
-                )
+                logging.info(f'Publishing STAC JSON to: s3://{args.publish_bucket}/{args.publish_prefix}/{file.name}')
+                upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=args.publish_prefix)
             else:
-                publish_uri = urlparse(args.granule_uri)
-                publish_bucket = publish_uri.netloc
-                publish_prefix = str(Path(publish_uri.path).parent)
-                logging.info(f'Publishing {file.suffix.upper()} to: {publish_bucket}/{publish_prefix}/{file.name}')
-                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_bucket, prefix=publish_prefix)
+                granule_prefix = str(Path(urlparse(args.granule_uri).path).parent)
+                logging.info(f'Publishing {file.suffix} to: s3://{args.publish_bucket}/{granule_prefix}/{file.name}')
+                upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=granule_prefix)
 
 
 if __name__ == '__main__':
