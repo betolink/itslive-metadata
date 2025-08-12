@@ -8,7 +8,7 @@ import s3fs
 from hyp3lib.aws import get_content_type, get_tag_set
 
 
-def determine_granule_uri_from_bucket(bucket: str, prefix: str)-> str:
+def determine_granule_uri_from_bucket(bucket: str, prefix: str) -> str:
     s3_fs = s3fs.S3FileSystem(anon=False)
 
     granule_folder = f's3://{bucket}/{prefix}'

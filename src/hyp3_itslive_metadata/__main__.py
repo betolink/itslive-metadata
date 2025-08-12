@@ -18,11 +18,17 @@ def str_without_trailing_slash(s: str) -> str:
 def main() -> None:
     """HyP3 entrypoint for hyp3_itslive_metadata."""
     parser = ArgumentParser()
-    hyp3_group = parser.add_argument_group('HyP3 content bucket', 'AWS S3 bucket and prefix to upload metadata product(s) to. Will also be used to find the input granule if `--granule-uri` is not provided`.')
+    hyp3_group = parser.add_argument_group(
+        'HyP3 content bucket',
+        'AWS S3 bucket and prefix to upload metadata product(s) to. Will also be used to find the input granule if `--granule-uri` is not provided`.',
+    )
     hyp3_group.add_argument('--bucket')
     hyp3_group.add_argument('--bucket-prefix', default='')
 
-    parser.add_argument('--granule-uri', help='URI for a granule to generate metadata for. If not provided, will find the first granule in HyP3 content bucket.')
+    parser.add_argument(
+        '--granule-uri',
+        help='URI for a granule to generate metadata for. If not provided, will find the first granule in HyP3 content bucket.',
+    )
 
     parser.add_argument(
         '--publish-output',
@@ -55,8 +61,9 @@ def main() -> None:
             if '.stac.json' in file.name:
                 logging.info(f'Publishing STAC JSON to: {args.stac_output}/{file.name}')
                 publish_uri = urlparse(args.stac_output)
-                upload_file_to_s3_with_publish_access_keys(file, bucket=publish_uri.netloc,
-                                                           prefix=publish_uri.path.lstrip('/'))
+                upload_file_to_s3_with_publish_access_keys(
+                    file, bucket=publish_uri.netloc, prefix=publish_uri.path.lstrip('/')
+                )
             else:
                 publish_uri = urlparse(args.granule_uri)
                 publish_bucket = publish_uri.netloc
