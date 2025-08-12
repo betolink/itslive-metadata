@@ -11,6 +11,9 @@ from hyp3_itslive_metadata.aws import determine_granule_uri_from_bucket, upload_
 from hyp3_itslive_metadata.process import process_itslive_metadata
 
 
+def str_without_trailing_slash(s: str) -> str:
+    return s.rstrip('/')
+
 def nullable_string(argument_string: str) -> str | None:
     argument_string = argument_string.replace('None', '').strip()
     return argument_string if argument_string else None
@@ -39,7 +42,7 @@ def main() -> None:
         '--publish-bucket', type=nullable_string,
     )
     publish_group.add_argument(
-        '--publish-prefix', type=nullable_string,
+        '--publish-prefix', type=str_without_trailing_slash,
     )
     args = parser.parse_args()
 
@@ -54,8 +57,8 @@ def main() -> None:
         else:
             raise ValueError('Must provide --granule-uri or --bucket')
 
-    if args.publish_prefix:
-        args.publish_prefix = args.publish_prefix.strip('/')
+    if args.publish_bucket and not args.publish_prefix:
+        raise ValueError('If you provide --publish-bucket you mist also provide --publish-prefix')
 
     metadata_files = process_itslive_metadata(args.granule_uri)
 
