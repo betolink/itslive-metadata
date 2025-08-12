@@ -59,8 +59,8 @@ def main() -> None:
     if args.publish_output:
         for file in metadata_files:
             if '.stac.json' in file.name:
-                logging.info(f'Publishing STAC JSON to: {args.stac_output}/{file.name}')
-                publish_uri = urlparse(args.stac_output)
+                logging.info(f'Publishing STAC JSON to: {args.publish_output}/{file.name}')
+                publish_uri = urlparse(args.publish_output)
                 upload_file_to_s3_with_publish_access_keys(
                     file, bucket=publish_uri.netloc, prefix=publish_uri.path.lstrip('/')
                 )
