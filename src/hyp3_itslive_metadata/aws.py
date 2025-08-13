@@ -1,3 +1,5 @@
+"""Helper functions for working with AWS."""
+
 import json
 import logging
 import os
@@ -9,6 +11,14 @@ from hyp3lib.aws import get_content_type, get_tag_set
 
 
 def determine_granule_uri_from_bucket(bucket: str, prefix: str) -> str:
+    """Find either a published netCDF velocity granule using the `publish_info.json` found in `s3://{bucket}/{prefix}`, or the first netCDF file found therein.
+
+    Args:
+        bucket: AWS S3 bucket to search in
+        prefix: AWS s3 prefix within the bucket to search in
+
+    Returns: S3 URI of the granule
+    """
     s3_fs = s3fs.S3FileSystem(anon=False)
 
     granule_folder = f's3://{bucket}/{prefix}'
@@ -26,7 +36,14 @@ def determine_granule_uri_from_bucket(bucket: str, prefix: str) -> str:
     return f's3://{bucket}/{prefix}/{name}'
 
 
-def upload_file_to_s3_with_publish_access_keys(path_to_file: Path, bucket: str, prefix: str = ''):
+def upload_file_to_s3_with_publish_access_keys(path_to_file: Path, bucket: str, prefix: str = '') -> None:
+    """Upload a fail to `s3://{bucket}/{prefix}/` using AWS access keys found in the `PUBLISH_ACCESS_KEY_ID` and `PUBLISH_SECRET_ACCESS_KEY` environment variables.
+
+    Args:
+        path_to_file: Path to the file to upload
+        bucket: AWS S3 bucket to upload files to
+        prefix: AWS S3 prefix within the bucket to upload files to
+    """
     try:
         access_key_id = os.environ['PUBLISH_ACCESS_KEY_ID']
         access_key_secret = os.environ['PUBLISH_SECRET_ACCESS_KEY']

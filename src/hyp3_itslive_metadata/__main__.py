@@ -11,11 +11,11 @@ from hyp3_itslive_metadata.aws import determine_granule_uri_from_bucket, upload_
 from hyp3_itslive_metadata.process import process_itslive_metadata
 
 
-def str_without_trailing_slash(s: str) -> str:
+def _str_without_trailing_slash(s: str) -> str:
     return s.rstrip('/')
 
 
-def nullable_string(argument_string: str) -> str | None:
+def _nullable_string(argument_string: str) -> str | None:
     argument_string = argument_string.replace('None', '').strip()
     return argument_string if argument_string else None
 
@@ -40,11 +40,11 @@ def main() -> None:
     )
     publish_group.add_argument(
         '--publish-bucket',
-        type=nullable_string,
+        type=_nullable_string,
     )
     publish_group.add_argument(
         '--publish-prefix',
-        type=str_without_trailing_slash,
+        type=_str_without_trailing_slash,
     )
     args = parser.parse_args()
 
