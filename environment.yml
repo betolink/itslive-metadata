@@ -13,8 +13,9 @@ dependencies:
   - neovim
   - zarr<=3.0.0a
   - unzip
-  - s3fs
   # For running
+  - boto3
   - hyp3lib>=3,<4
+  - s3fs
   - pip:
       - -r requirements-static.txt
