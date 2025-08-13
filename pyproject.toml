@@ -10,10 +10,10 @@ authors = [
     {name="betolink", email="betolin@gmail.com"},
 ]
 description = "ITS_LIVE granle metadata generator"
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 classifiers=[
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
