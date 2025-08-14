@@ -16,6 +16,6 @@ dependencies:
   # For running
   - boto3
   - hyp3lib>=3,<4
-  - s3fs
+  - s3fs>=2025.1.0
   - pip:
       - -r requirements-static.txt
