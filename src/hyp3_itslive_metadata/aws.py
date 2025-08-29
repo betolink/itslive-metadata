@@ -22,8 +22,10 @@ def determine_granule_uri_from_bucket(bucket: str, prefix: str) -> str:
     s3_fs = s3fs.S3FileSystem(anon=False)
 
     granule_folder = f's3://{bucket}/{prefix}'
+    logging.info(f'Looking for granule in {granule_folder}')
     if s3_fs.exists(f'{granule_folder}/publish_info.json'):
         publish_info = json.loads(s3_fs.cat(f'{granule_folder}/publish_info.json'))
+        logging.debug(f'Found publish_info.json in {granule_folder}: {publish_info}')
         bucket = publish_info['bucket']
         prefix = publish_info['prefix']
         name = publish_info['name']

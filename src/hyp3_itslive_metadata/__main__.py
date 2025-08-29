@@ -48,11 +48,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
-    )
-    logging.info(f'Processing itslive metadata with args: {args}')
-
     if args.granule_uri is None:
         if args.bucket:
             args.granule_uri = determine_granule_uri_from_bucket(args.bucket, args.bucket_prefix)
@@ -61,6 +56,11 @@ def main() -> None:
 
     if args.publish_bucket and not args.publish_prefix:
         raise ValueError('If you provide --publish-bucket you mist also provide --publish-prefix')
+
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
+    )
+    logging.info(f'Processing itslive metadata with args: {args}')
 
     metadata_files = process_itslive_metadata(args.granule_uri)
 
