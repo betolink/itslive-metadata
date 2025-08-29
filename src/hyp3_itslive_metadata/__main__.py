@@ -48,11 +48,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
-    )
-    logging.info(f'Processing itslive metadata with args: {args}')
-
     if args.granule_uri is None:
         if args.bucket:
             args.granule_uri = determine_granule_uri_from_bucket(args.bucket, args.bucket_prefix)
@@ -61,6 +56,11 @@ def main() -> None:
 
     if args.publish_bucket and not args.publish_prefix:
         raise ValueError('If you provide --publish-bucket you mist also provide --publish-prefix')
+
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO
+    )
+    logging.info(f'Processing itslive metadata with args: {args}')
 
     metadata_files = process_itslive_metadata(args.granule_uri)
 
@@ -75,7 +75,7 @@ def main() -> None:
                 logging.info(f'Publishing STAC JSON to: s3://{args.publish_bucket}/{args.publish_prefix}/{file.name}')
                 upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=args.publish_prefix)
             else:
-                granule_prefix = str(Path(urlparse(args.granule_uri).path).parent)
+                granule_prefix = str(Path(urlparse(args.granule_uri).path).parent).lstrip('/')
                 logging.info(f'Publishing {file.suffix} to: s3://{args.publish_bucket}/{granule_prefix}/{file.name}')
                 upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=granule_prefix)
 
