@@ -76,7 +76,6 @@ def main() -> None:
                 upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=args.publish_prefix)
             else:
                 granule_prefix = str(Path(urlparse(args.granule_uri).path).parent).lstrip('/')
-                logging.info(f'Publishing granule prefix: {granule_prefix}')
                 logging.info(f'Publishing {file.suffix} to: s3://{args.publish_bucket}/{granule_prefix}/{file.name}')
                 upload_file_to_s3_with_publish_access_keys(file, bucket=args.publish_bucket, prefix=granule_prefix)
 
